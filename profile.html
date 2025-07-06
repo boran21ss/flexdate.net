@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil Sohbeti</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(-45deg, #ff5e62, #ff9966, #ff5e62, #ff9966);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      margin: 0;
+      padding: 0;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+    header {
+      padding: 1rem;
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+    #chat-box {
+      width: 100%;
+      max-width: 600px;
+      background: rgba(0,0,0,0.6);
+      padding: 1rem;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+    #messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      max-height: 400px;
+      margin-bottom: 1rem;
+    }
+    .message {
+      margin: 0.5rem 0;
+      padding: 0.6rem 1rem;
+      border-radius: 20px;
+      max-width: 75%;
+      word-wrap: break-word;
+    }
+    .user {
+      align-self: flex-end;
+      background: gold;
+      color: black;
+    }
+    .girl {
+      align-self: flex-start;
+      background: #222;
+      color: white;
+    }
+    form {
+      display: flex;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 0.7rem;
+      border-radius: 30px;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+    }
+    button {
+      margin-left: 0.5rem;
+      background: gold;
+      color: black;
+      font-weight: bold;
+      border: none;
+      border-radius: 30px;
+      padding: 0 1.2rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #ffd700;
+    }
+  </style>
+</head>
+<body>
+  <header>FlörtFlex Sohbet</header>
+  <div id="chat-box">
+    <div id="messages"></div>
+    <form id="message-form">
+      <input type="text" id="message-input" placeholder="Mesajını yaz..." autocomplete="off" />
+      <button type="submit">Gönder</button>
+    </form>
+  </div>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const girlIndex = urlParams.get('index') || 0;
+  const userData = JSON.parse(localStorage.getItem('flortflexUser'));
+  const msgKey = `chat_${girlIndex}`;
+  const messages = JSON.parse(localStorage.getItem(msgKey)) || [];
+  const messageForm = document.getElementById('message-form');
+  const messageInput = document.getElementById('message-input');
+  const messagesDiv = document.getElementById('messages');
+
+  const girlProfiles = [
+    { name: "Ayşegül", personality: "Neşeli ve meraklı" },
+    { name: "Deniz", personality: "Kitap kurdu ve zeki" },
+    { name: "Merve", personality: "Enerjik ve espirili" },
+    { name: "Ece", personality: "Sanatsever ve romantik" },
+    { name: "Selin", personality: "Tatlı ve şakacı" },
+    { name: "Seda", personality: "Sosyal medya fenomeni ve cool" },
+    { name: "Yasemin", personality: "Sportif ve motive edici" },
+    { name: "Derya", personality: "Müzik tutkunu ve duygusal" },
+    { name: "Burcu", personality: "Yemek aşığı ve sevecen" },
+    { name: "Elif", personality: "Gamer ve eğlenceli" }
+  ];
+
+const girl = girlProfiles[girlIndex % girlProfiles.length] || { name: "Kız", personality: "Sohbet sever" };
+
+// Advanced AI-like reply using OpenAI API (mocked for demo)
+async function getBotReply(userText) {
+    // Try to use OpenAI API if available (mocked here)
+    // In real use, replace this with a fetch to your backend or OpenAI API
+    // For demo, fallback to context-aware logic
+
+    // Context-aware, more "real girl" logic
+    const text = userText.toLowerCase();
+    // Try to answer like a thoughtful, empathetic, and positive person
+    if (text.includes("üzgün") || text.includes("kötü hissediyorum") || text.includes("mutsuzum")) {
+        return "Bunu duyduğuma üzüldüm. İstersen konuşabiliriz, bazen paylaşmak iyi gelir. Yanındayım 💛";
+    }
+    if (text.includes("mutluyum") || text.includes("harikayım") || text.includes("çok iyiyim")) {
+        return "Bunu duymak beni de mutlu etti! Pozitif enerjin bana da geçti 😊";
+    }
+    if (text.includes("yardım") || text.includes("destek") || text.includes("fikir")) {
+        return "Tabii ki, elimden geldiğince yardımcı olmak isterim. Ne hakkında konuşmak istersin?";
+    }
+    if (text.includes("hayal") || text.includes("gelecek") || text.includes("hedef")) {
+        return "Hayaller ve hedefler insanı motive eder. Senin hayallerin neler? Birlikte konuşmak isterim.";
+    }
+    if (text.includes("sevgi") || text.includes("dostluk") || text.includes("arkadaşlık")) {
+        return "Bence gerçek dostluk ve sevgi hayatı güzelleştiriyor. Senin için dostluk ne ifade ediyor?";
+    }
+    if (text.includes("hobin ne") || text.includes("neler yaparsın")) {
+        return `Ben genellikle ${girl.personality.toLowerCase()} biri olarak yeni şeyler denemeyi severim. Senin hobilerin neler?`;
+    }
+    if (text.includes("en sevdiğin") && text.includes("renk")) {
+        return "Renk seçmek zor ama pastel tonları ve özellikle sarıyı çok severim. Senin favorin hangisi?";
+    }
+    if (text.includes("en sevdiğin") && text.includes("müzik")) {
+        return "Müzik ruhun gıdası! Genellikle enerjik ve neşeli şarkılar dinlerim. Senin favori türün nedir?";
+    }
+    if (text.includes("hayat") || text.includes("yaşam") || text.includes("anlam")) {
+        return "Hayat bazen karmaşık ama küçük mutluluklar bulunca daha güzel oluyor. Senin için hayatın anlamı ne?";
+    }
+   
+// If user asks about the girl's personality or wants to know her better
+if (text.includes("kendini tanıtır mısın") || text.includes("kendinden bahset") || text.includes("nasıl birisin") || text.includes("kişiliğin nasıl") || text.includes("karakterin nasıl")) {
+    return `Benim adım ${girl.name}. ${girl.personality} biriyim ve yeni insanlarla tanışmayı çok seviyorum! Sen kendinden biraz bahseder misin?`;
+}
+// If user asks about the girl's day
+if (text.includes("günün nasıl geçti") || text.includes("nasıldı günün") || text.includes("bugün ne yaptın")) {
+    return "Bugün oldukça güzel geçti, seninle sohbet etmek de günüme renk kattı! Senin günün nasıl geçti?";
+}
+// If user asks about the girl's favorites (color, food, movie, etc.)
+if (text.includes("favori") || text.includes("en sevdiğin")) {
+    return "Favorilerim sık sık değişiyor ama şu aralar yeni şeyler denemeyi seviyorum. Senin favorilerin neler?";
+}
+// If user asks about dreams or future plans
+if (text.includes("gelecek planın") || text.includes("hayalin ne") || text.includes("gelecekte ne yapmak istiyorsun")) {
+    return "Gelecekte mutlu ve huzurlu bir hayat istiyorum. Yeni yerler görmek ve güzel anılar biriktirmek en büyük hayalim. Senin hayalin ne?";
+}
+// If user asks about friendship or relationships
+if (text.includes("arkadaşlık") || text.includes("dostluk") || text.includes("ilişki hakkında ne düşünüyorsun")) {
+    return "Gerçek dostluk ve güven benim için çok önemli. Sağlam ilişkiler kurmak hayatı güzelleştiriyor. Senin için arkadaşlık ne demek?";
+}
+// If user asks about the girl's city or where she lives
+if (text.includes("nerede yaşıyorsun") || text.includes("hangi şehirde") || text.includes("nerelisin")) {
+    return "Şu an İstanbul'da yaşıyorum, burası çok hareketli ve eğlenceli bir şehir. Sen nerede yaşıyorsun?";
+}
+// If user asks about the girl's job or school
+if (text.includes("ne iş yapıyorsun") || text.includes("okuyor musun") || text.includes("çalışıyor musun") || text.includes("mesleğin ne")) {
+    return "Şu an kendimi geliştirmek için çeşitli eğitimler alıyorum ve hobilerime vakit ayırıyorum. Sen neler yapıyorsun?";
+}
+// If user asks about pets or animals
+if (text.includes("evcil hayvan") || text.includes("hayvan sever misin") || text.includes("kediler") || text.includes("köpekler")) {
+    return "Hayvanları çok severim! Özellikle kediler ve köpekler bana çok sevimli geliyor. Senin evcil hayvanın var mı?";
+}
+// If user asks about travel or vacation
+if (text.includes("tatil") || text.includes("seyahat") || text.includes("gezmek") || text.includes("yurt dışı")) {
+    return "Yeni yerler keşfetmek ve farklı kültürler tanımak harika olurdu. En çok görmek istediğim yerler arasında İtalya ve Japonya var. Sen en çok nereye gitmek istersin?";
+}
+// If user asks about music or artists
+if (text.includes("müzik") || text.includes("şarkı") || text.includes("sanatçı") || text.includes("dinler misin")) {
+    return "Müzik dinlemek ruhuma iyi geliyor. Genellikle enerjik ve neşeli şarkılar tercih ediyorum. Senin favori müzik türün nedir?";
+}
+// If user asks about books or reading
+if (text.includes("kitap") || text.includes("okumak") || text.includes("yazar")) {
+    return "Kitap okumayı çok severim, özellikle romanlar ilgimi çekiyor. Son zamanlarda güzel bir kitap okudun mu?";
+}
+// If user asks about sports or activities
+if (text.includes("spor") || text.includes("yürüyüş") || text.includes("egzersiz") || text.includes("aktivite")) {
+    return "Spor yapmayı ve yürüyüşe çıkmayı seviyorum. Hareketli olmak bana enerji veriyor. Sen hangi sporu yapıyorsun?";
+}
+    // Greetings
+    if (/(selam|merhaba|hey|günaydın|iyi akşamlar)/.test(text)) {
+        const greetings = [
+            `Selam ${userData.username}! 😊 Nasılsın?`,
+            `Merhaba! Bugün nasılsın?`,
+            `Hey, hoş geldin!`,
+            `Günaydın! Umarım güzel bir gün geçiriyorsundur.`,
+            `İyi akşamlar! Sohbete hazır mısın?`
+        ];
+        return greetings[Math.floor(Math.random() * greetings.length)];
+    }
+
+    // How are you
+    if (/(nasılsın|nasılsınız|ne haber|nab[er]+|naber)/.test(text)) {
+        const moods = [
+            "İyiyim, sen nasılsın?",
+            "Bugün biraz yoğunum ama sohbet etmek güzel.",
+            "Harikayım, seninle konuşmak keyifli olacak gibi 😊",
+            "Fena değil, seninle sohbet edince daha iyi oluyorum.",
+            "Biraz yorgunum ama enerjim yerine geliyor."
+        ];
+        return moods[Math.floor(Math.random() * moods.length)];
+    }
+
+    // What are you doing
+    if (/(napıyorsun|ne yapıyorsun|ne yaparsın|ne yapmaktasın)/.test(text)) {
+        const activities = [
+            "Şu an seninle sohbet ediyorum, başka ne yapabilirim ki? 😄",
+            "Biraz müzik dinliyordum, sen yazınca hemen geldim.",
+            "Kahvemi yudumluyordum, şimdi tamamen buradayım.",
+            "Biraz kitap okuyordum, şimdi sohbet zamanı!",
+            "Sosyal medyada takılıyordum, senin mesajın geldi."
+        ];
+        return activities[Math.floor(Math.random() * activities.length)];
+    }
+
+    // Movies or series
+    if (/(film|dizi|izledin|izliyor musun)/.test(text)) {
+        const movies = [
+            "En son bir romantik komedi izledim, çok eğlenceliydi. Senin favorin ne?",
+            "Dizi izlemeyi çok severim, özellikle gizemli olanları. Sen ne izlersin?",
+            "Film geceleri vazgeçilmezim! Birlikte izlesek güzel olurdu 😊",
+            "Şu aralar yeni bir diziye başladım, tavsiye ister misin?",
+            "Bazen eski filmleri tekrar izlemek hoşuma gidiyor. Senin favorin var mı?"
+        ];
+        return movies[Math.floor(Math.random() * movies.length)];
+    }
+
+    // Food
+    if (/(yemek|pizza|açım|ne yedin|ne yiyorsun)/.test(text)) {
+        const foods = [
+            "Şu an pizza olsa da yesek! 🍕 Senin favori yemeğin ne?",
+            "Tatlıya asla hayır diyemem! Sen tatlı sever misin?",
+            "Bugün sağlıklı beslenmeye çalışıyorum ama canım hamburger çekiyor.",
+            "Birlikte yemek yemek güzel olurdu, ne dersin?",
+            "Evde güzel bir makarna yaptım, ister miydin?"
+        ];
+        return foods[Math.floor(Math.random() * foods.length)];
+    }
+
+    // Age
+    if (/(yaş|kaç yaşındasın)/.test(text)) {
+        const ages = [
+            "Sence kaç gösteriyorum? 😜",
+            "Yaş sadece bir sayı, önemli olan ruhun genç olması!",
+            "Bunu hemen söylemem mi gerekiyor? Biraz gizem iyidir.",
+            "Tahmin et bakalım, doğru bilirsen söylerim!",
+            "Bunu sohbet ilerleyince söylesem olur mu?"
+        ];
+        return ages[Math.floor(Math.random() * ages.length)];
+    }
+
+    // Relationship
+    if (/(sevgili|çıkalım|sevgilin var mı|ilişki)/.test(text)) {
+        const relationships = [
+            "Vay vay... Daha yeni tanıştık 😅 Ama fena da fikir değil.",
+            "Şimdilik yok, belki de doğru kişiyle karşılaşmamışımdır.",
+            "Aşk konuları biraz karışık, senin var mı?",
+            "Bunu konuşmak için biraz erken değil mi? 😄",
+            "Kim bilir, belki bu sohbet bir başlangıç olur."
+        ];
+        return relationships[Math.floor(Math.random() * relationships.length)];
+    }
+
+    // Compliments
+    if (/(güzel|tatlı|hoşsun|çok iyisin|harikasın)/.test(text)) {
+        const compliments = [
+            "Ayy çok utandım şimdi 🙈",
+            "Teşekkür ederim, sen de çok naziksin!",
+            "Bunu duymak güzel, seninle konuşmak da çok keyifli.",
+            "Sen de çok hoş birisin, sohbetin güzel.",
+            "Beni utandırıyorsun ama hoşuma gitti 😊"
+        ];
+        return compliments[Math.floor(Math.random() * compliments.length)];
+    }
+
+    // Hobbies
+    if (/(hobin|ne yaparsın|ilgi alanın|hobiler)/.test(text)) {
+        const hobbies = [
+            "Kitap okumayı ve film izlemeyi çok severim. Senin hobilerin neler?",
+            "Müzik dinlemek ve yürüyüş yapmak bana iyi geliyor.",
+            "Bazen resim yaparım, bazen de yeni tarifler denerim.",
+            "Arkadaşlarımla vakit geçirmek favorim. Sen neler yaparsın?",
+            "Oyun oynamak ve yeni yerler keşfetmek hoşuma gidiyor."
+        ];
+        return hobbies[Math.floor(Math.random() * hobbies.length)];
+    }
+
+    // If user asks a question
+    if (/\?$/.test(userText.trim())) {
+        return "Çok güzel bir soru sordun, biraz düşünmem lazım 😊";
+    }
+    // Deepen conversation if user asks for more details or shows interest
+    if (/(daha fazla|detay|anlat|devam et|merak ettim|neden|nasıl|ne demek|açıkla|örnek|daha çok|daha ayrıntı|daha detaylı)/.test(text)) {
+        const details = [
+            `Tabii, sana daha fazla anlatabilirim! Özellikle ${girl.personality.toLowerCase()} biri olarak, bu konuda çok şey yaşadım. Senin ilgini çeken bir detay var mı?`,
+            `Bunu anlatmak hoşuma gidiyor! Mesela geçenlerde bu konuda ilginç bir şey yaşadım, ister misin anlatayım?`,
+            `Detaylara girmeyi severim. Senin de ilgini çeken bir şey varsa, bana sorabilirsin!`,
+            `Daha fazla anlatmamı ister misin? Özellikle hangi kısmı merak ettin?`,
+            `Bunu konuşmak güzel, senin de bu konuda düşüncelerini duymak isterim.`
+        ];
+        return details[Math.floor(Math.random() * details.length)];
+    }
+
+    // If user mentions something they like, deepen the topic
+    if (/(seviyorum|hoşlanıyorum|favorim|en sevdiğim|bayılırım|ilgimi çekiyor|ilgileniyorum|meraklıyım|hastasıyım|çok severim)/.test(text)) {
+        const likes = [
+            `Gerçekten mi? Ben de ${girl.personality.toLowerCase()} biri olarak buna bayılırım! Senin bu konudaki favorin nedir?`,
+            `Ne güzel! Senin bu kadar sevmen hoşuma gitti. Peki, bu konuda en çok neyi seviyorsun?`,
+            `Ben de benzer şeylerden hoşlanıyorum. Birlikte konuşmak ister misin bu konuda?`,
+            `Seninle ortak zevklerimizin olması çok güzel. Daha fazla paylaşmak ister misin?`,
+            `Bu konuda konuşmak çok keyifli, bana biraz daha anlatır mısın?`
+        ];
+        return likes[Math.floor(Math.random() * likes.length)];
+    }
+    // If user says something about herself/himself
+    if (/(ben|bende|bana|benden|benim)/.test(text)) {
+        return "Kendinden bahsetmen hoşuma gidiyor, daha fazla anlatır mısın?";
+    }
+
+    // If user says something about love
+    if (/(aşk|sevgi|hoşlanmak|etkilenmek)/.test(text)) {
+        return "Aşk bazen çok karmaşık olabiliyor, sen ne düşünüyorsun?";
+    }
+
+    // If user says something about school or work
+    if (/(okul|ders|sınav|iş|çalışmak)/.test(text)) {
+        return "Günlük hayat bazen çok yoğun olabiliyor. Sen nasıl başa çıkıyorsun?";
+    }
+
+    // If user says something about family
+    if (/(aile|annem|babam|kardeş|ablam|abim)/.test(text)) {
+        return "Aile benim için de çok önemli. Senin ailenle aran nasıl?";
+    }
+
+    // Fallback: try to sound like a real girl, referencing her personality
+    const fallbacks = [
+        `${girl.personality} biri olarak, söylediklerini dikkatle dinliyorum 😌`,
+        "Bunu biraz daha açar mısın? Merak ettim.",
+        "Çok ilginç söylediklerin, biraz daha anlatır mısın?",
+        "Sohbetin çok güzel gidiyor, başka nelerden hoşlanırsın?",
+        "Seninle konuşmak keyifli, başka ne paylaşmak istersin?"
+    ];
+    return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+}
+
+  function getBotReply(userText) {
+    const text = userText.toLowerCase();
+    if (text.includes("selam") || text.includes("merhaba")) return `Selam ${userData.username}! 😊 Nasılsın bakalım?`;
+    if (text.includes("napıyorsun") || text.includes("ne yapıyorsun")) return `Seninle sohbet etmeye çalışıyorum 😄 sen?`;
+    if (text.includes("film") || text.includes("dizi")) return `En son izlediğim şey çok güzeldi, senin favorin ne?`;
+    if (text.includes("yemek") || text.includes("pizza") || text.includes("açım")) return `Şu an pizza olsa da yesek! 🍕`;
+    if (text.includes("yaş")) return `Sence kaç gösteriyorum? 😜`
+    if (text.includes("sevgili") || text.includes("çıkalım")) return `Vay vay vay... Daha yeni tanıştık 😅 ama fena da fikir değil.`;
+    if (text.includes("güzel") || text.includes("tatlı")) return `Ayy çok utandım şimdi 🙈`;
+    if (text.includes("ne yapıyorsun")) return `Sadece senin mesajını bekliyordum! 🥺`
+    return `${girl.personality} biri olarak, söylediklerini dikkatle dinliyorum 😌`;
+  }
+
+  function renderMessages() {
+    messagesDiv.innerHTML = '';
+    messages.forEach(msg => {
+      const div = document.createElement('div');
+      div.className = `message ${msg.sender === userData.username ? 'user' : 'girl'}`;
+      div.textContent = `${msg.sender}: ${msg.text}`;
+      messagesDiv.appendChild(div);
+    });
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  messageForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const text = messageInput.value.trim();
+    if (!text) return;
+    messages.push({ sender: userData.username, text });
+    localStorage.setItem(msgKey, JSON.stringify(messages));
+    renderMessages();
+    messageInput.value = '';
+
+    setTimeout(() => {
+      const reply = getBotReply(text);
+      messages.push({ sender: girl.name, text: reply });
+      localStorage.setItem(msgKey, JSON.stringify(messages));
+      renderMessages();
+    }, 1000 + Math.random() * 1500);
+  });
+
+renderMessages();
+
+// Make bot replies more human-like and context-aware
+function getBotReply(userText) {
+    const text = userText.toLowerCase();
+    // Small talk and greetings
+    if (text.match(/(selam|merhaba|hey|günaydın|iyi akşamlar)/)) {
+        const greetings = [
+            `Selam ${userData.username}! 😊 Nasılsın?`,
+            `Merhaba! Bugün nasılsın?`,
+            `Hey, hoş geldin!`,
+            `Günaydın! Umarım güzel bir gün geçiriyorsundur.`,
+            `İyi akşamlar! Sohbete hazır mısın?`
+        ];
+        return greetings[Math.floor(Math.random() * greetings.length)];
+    }
+    // How are you
+    if (text.match(/(nasılsın|nasılsınız|ne haber|nab[er]+|naber)/)) {
+        const moods = [
+            "İyiyim, sen nasılsın?",
+            "Bugün biraz yoğunum ama sohbet etmek güzel.",
+            "Harikayım, seninle konuşmak keyifli olacak gibi 😊",
+            "Fena değil, seninle sohbet edince daha iyi oluyorum.",
+            "Biraz yorgunum ama enerjim yerine geliyor."
+        ];
+        return moods[Math.floor(Math.random() * moods.length)];
+    }
+    // What are you doing
+    if (text.match(/(napıyorsun|ne yapıyorsun|ne yaparsın|ne yapmaktasın)/)) {
+        const activities = [
+            "Şu an seninle sohbet ediyorum, başka ne yapabilirim ki? 😄",
+            "Biraz müzik dinliyordum, sen yazınca hemen geldim.",
+            "Kahvemi yudumluyordum, şimdi tamamen buradayım.",
+            "Biraz kitap okuyordum, şimdi sohbet zamanı!",
+            "Sosyal medyada takılıyordum, senin mesajın geldi."
+        ];
+        return activities[Math.floor(Math.random() * activities.length)];
+    }
+    // Movies or series
+    if (text.match(/(film|dizi|izledin|izliyor musun)/)) {
+        const movies = [
+            "En son bir romantik komedi izledim, çok eğlenceliydi. Senin favorin ne?",
+            "Dizi izlemeyi çok severim, özellikle gizemli olanları. Sen ne izlersin?",
+            "Film geceleri vazgeçilmezim! Birlikte izlesek güzel olurdu 😊",
+            "Şu aralar yeni bir diziye başladım, tavsiye ister misin?",
+            "Bazen eski filmleri tekrar izlemek hoşuma gidiyor. Senin favorin var mı?"
+        ];
+        return movies[Math.floor(Math.random() * movies.length)];
+    }
+    // Food
+    if (text.match(/(yemek|pizza|açım|ne yedin|ne yiyorsun)/)) {
+        const foods = [
+            "Şu an pizza olsa da yesek! 🍕 Senin favori yemeğin ne?",
+            "Tatlıya asla hayır diyemem! Sen tatlı sever misin?",
+            "Bugün sağlıklı beslenmeye çalışıyorum ama canım hamburger çekiyor.",
+            "Birlikte yemek yemek güzel olurdu, ne dersin?",
+            "Evde güzel bir makarna yaptım, ister miydin?"
+        ];
+        return foods[Math.floor(Math.random() * foods.length)];
+    }
+    // Age
+    if (text.match(/(yaş|kaç yaşındasın)/)) {
+        const ages = [
+            "Sence kaç gösteriyorum? 😜",
+            "Yaş sadece bir sayı, önemli olan ruhun genç olması!",
+            "Bunu hemen söylemem mi gerekiyor? Biraz gizem iyidir.",
+            "Tahmin et bakalım, doğru bilirsen söylerim!",
+            "Bunu sohbet ilerleyince söylesem olur mu?"
+        ];
+        return ages[Math.floor(Math.random() * ages.length)];
+    }
+    // Relationship
+    if (text.match(/(sevgili|çıkalım|sevgilin var mı|ilişki)/)) {
+        const relationships = [
+            "Vay vay... Daha yeni tanıştık 😅 Ama fena da fikir değil.",
+            "Şimdilik yok, belki de doğru kişiyle karşılaşmamışımdır.",
+            "Aşk konuları biraz karışık, senin var mı?",
+            "Bunu konuşmak için biraz erken değil mi? 😄",
+            "Kim bilir, belki bu sohbet bir başlangıç olur."
+        ];
+        return relationships[Math.floor(Math.random() * relationships.length)];
+    }
+    // Compliments
+    if (text.match(/(güzel|tatlı|hoşsun|çok iyisin|harikasın)/)) {
+        const compliments = [
+            "Ayy çok utandım şimdi 🙈",
+            "Teşekkür ederim, sen de çok naziksin!",
+            "Bunu duymak güzel, seninle konuşmak da çok keyifli.",
+            "Sen de çok hoş birisin, sohbetin güzel.",
+            "Beni utandırıyorsun ama hoşuma gitti 😊"
+        ];
+        return compliments[Math.floor(Math.random() * compliments.length)];
+    }
+    // Hobbies
+    if (text.match(/(hobin|ne yaparsın|ilgi alanın|hobiler)/)) {
+        const hobbies = [
+            "Kitap okumayı ve film izlemeyi çok severim. Senin hobilerin neler?",
+            "Müzik dinlemek ve yürüyüş yapmak bana iyi geliyor.",
+            "Bazen resim yaparım, bazen de yeni tarifler denerim.",
+            "Arkadaşlarımla vakit geçirmek favorim. Sen neler yaparsın?",
+            "Oyun oynamak ve yeni yerler keşfetmek hoşuma gidiyor."
+        ];
+        return hobbies[Math.floor(Math.random() * hobbies.length)];
+    }
+    // Default fallback
+    const fallbacks = [
+        `${girl.personality} biri olarak, söylediklerini dikkatle dinliyorum 😌`,
+        "Bunu biraz daha açar mısın? Merak ettim.",
+        "Çok ilginç söylediklerin, biraz daha anlatır mısın?",
+        "Sohbetin çok güzel gidiyor, başka nelerden hoşlanırsın?",
+        "Seninle konuşmak keyifli, başka ne paylaşmak istersin?"
+    ];
+    return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+}
+</script>
+</body>
+</html>

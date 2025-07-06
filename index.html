@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FlörtFlex - Ana Sayfa</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  /* Temel ve responsive stil */
+  body {
+    margin:0; font-family: 'Rubik', sans-serif;
+    background: linear-gradient(-45deg, #ff5e62, #ff9966, #ff5e62, #ff9966);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+  }
+  @keyframes gradientBG {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+  }
+  body.dark {
+    background: linear-gradient(-45deg, #1a1a1a, #2b2b2b, #1a1a1a);
+    background-size: 400% 400%;
+  }
+  header {
+    width: 100%; max-width: 1000px; margin-bottom: 1rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  h1 {
+    margin: 0; font-weight: 700; font-size: 2.2rem; user-select:none;
+  }
+  button {
+    cursor: pointer; user-select:none;
+  }
+  #toggle-theme {
+    background: gold; border:none;
+    padding: 0.5rem 1.2rem; border-radius: 30px;
+    font-weight: 700; color: black;
+    box-shadow: 0 0 10px rgba(255,223,0,0.8);
+    transition: background 0.3s ease;
+  }
+  #toggle-theme:hover {
+    background: #ffd700;
+  }
+  #logout-btn {
+    background: #ff4444; border:none;
+    padding: 0.5rem 1rem; border-radius: 30px;
+    font-weight: 700; color: white;
+    box-shadow: 0 0 10px rgba(255,68,68,0.8);
+    display: none;
+    transition: background 0.3s ease;
+  }
+  #logout-btn:hover {
+    background: #ff0000;
+  }
+  #forms-container {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    max-width: 1000px;
+    justify-content: center;
+  }
+  form {
+    background: rgba(0,0,0,0.6);
+    padding: 2rem 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 0 25px rgba(255,223,0,0.8);
+    width: 320px;
+  }
+  form h2 {
+    margin-top: 0; margin-bottom: 1rem;
+  }
+  input {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    margin: 0.7rem 0;
+    border-radius: 30px;
+    border: none;
+    font-size: 1rem;
+    outline: none;
+  }
+  .password-wrapper {
+    position: relative;
+  }
+  .toggle-pass {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: gold;
+    font-weight: 700;
+    user-select:none;
+  }
+  button[type=submit] {
+    width: 100%;
+    background: gold;
+    border: none;
+    padding: 1rem;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    box-shadow: 0 0 15px rgba(255,223,0,0.9);
+    transition: background 0.3s ease;
+  }
+  button[type=submit]:hover {
+    background: #ffd700;
+  }
+  #error-msg {
+    color: #ff6666;
+    font-weight: 700;
+    margin-top: 0.3rem;
+    min-height: 20px;
+  }
+  #success-msg {
+    color: #88ff88;
+    font-weight: 700;
+    margin-top: 0.3rem;
+    min-height: 20px;
+  }
+  #profile-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+    gap: 1rem;
+    max-width: 1000px;
+    width: 100%;
+  }
+  .profile-card {
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 0 15px rgba(255,223,0,0.4);
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  .profile-card:hover {
+    transform: scale(1.05);
+  }
+  .profile-card img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid gold;
+    box-shadow: 0 0 10px gold;
+    margin-bottom: 0.8rem;
+  }
+  .profile-card h3 {
+    margin: 0.3rem 0 0.1rem 0;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+  .profile-card p {
+    margin: 0;
+    font-style: italic;
+    font-size: 0.9rem;
+  }
+  .locked {
+    filter: grayscale(80%);
+    position: relative;
+  }
+  .locked::after {
+    content: "🔒 PREMIUM";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: gold;
+    color: black;
+    font-weight: 700;
+    padding: 3px 6px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+  }
+  #premium-popup {
+    position: fixed;
+    top:50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255,223,0,0.95);
+    color: black;
+    padding: 2rem 3rem;
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(255,223,0,0.9);
+    font-weight: 700;
+    font-size: 1.5rem;
+    display: none;
+    z-index: 1000;
+    user-select:none;
+  }
+  #premium-popup button {
+    margin-top: 1rem;
+    background: black;
+    color: gold;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-weight: 700;
+    border-radius: 10px;
+  }
+  #premium-popup button:hover {
+    background: #222;
+  }
+  /* Responsive */
+  @media(max-width:720px){
+    #forms-container {
+      flex-direction: column;
+      align-items: center;
+    }
+    form {
+      width: 90vw;
+    }
+    #profile-list {
+      grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>FlörtFlex</h1>
+  <button id="toggle-theme">Gece Modu</button>
+  <button id="logout-btn">Çıkış Yap</button>
+</header>
+
+<div id="forms-container">
+  <form id="register-form">
+    <h2>Kayıt Ol</h2>
+    <input type="text" id="reg-username" placeholder="Kullanıcı Adı" required minlength="3" />
+    <input type="email" id="reg-email" placeholder="E-posta" required />
+    <div class="password-wrapper">
+      <input type="password" id="reg-password" placeholder="Şifre" required minlength="5" />
+      <span class="toggle-pass" id="reg-toggle-pass">Göster</span>
+    </div>
+    <button type="submit">Kayıt Ol</button>
+    <div id="register-error-msg"></div>
+    <div id="register-success-msg"></div>
+  </form>
+
+  <form id="login-form">
+    <h2>Giriş Yap</h2>
+    <input type="email" id="login-email" placeholder="E-posta" required />
+    <div class="password-wrapper">
+      <input type="password" id="login-password" placeholder="Şifre" required />
+      <span class="toggle-pass" id="login-toggle-pass">Göster</span>
+    </div>
+    <button type="submit">Giriş Yap</button>
+    <div id="login-error-msg"></div>
+  </form>
+</div>
+
+<section id="profile-list"></section>
+
+<div id="premium-popup">
+  Premium üyelik sadece 120 TL! 😂<br />
+  <button id="close-popup">Kapat</button>
+</div>
+
+<script>
+  const profiles = [
+    {name:"Ayşegül", age:21, bio:"K-pop bağımlısı ve dansçı", img:"https://thispersondoesnotexist.com/image", premium:false},
+    {name:"Deniz", age:23, bio:"Kitap kurdu ve kahve delisi", img:"https://randomuser.me/api/portraits/women/68.jpg", premium:false},
+    {name:"Merve", age:19, bio:"Gezgin ruhlu, maceraperest", img:"https://randomuser.me/api/portraits/women/65.jpg", premium:false},
+    {name:"Ece", age:22, bio:"Sanat aşığı ve fotoğrafçı", img:"https://randomuser.me/api/portraits/women/44.jpg", premium:false},
+    {name:"Selin", age:20, bio:"Netflix bağımlısı, pizza sever", img:"https://randomuser.me/api/portraits/women/12.jpg", premium:false},
+
+    {name:"Seda", age:24, bio:"Sosyal medya fenomeni", img:"https://randomuser.me/api/portraits/women/47.jpg", premium:true},
+    {name:"Yasemin", age:25, bio:"Fitness tutkunusu", img:"https://randomuser.me/api/portraits/women/5.jpg", premium:true},
+    {name:"Derya", age:22, bio:"Müzik ve dans tutkunu", img:"https://randomuser.me/api/portraits/women/20.jpg", premium:true},
+    {name:"Burcu", age:23, bio:"Yemek bloggerı", img:"https://randomuser.me/api/portraits/women/50.jpg", premium:true},
+    {name:"Elif", age:21, bio:"Kedi aşığı ve gamer", img:"https://randomuser.me/api/portraits/women/15.jpg", premium:true},
+
+    {name:"Büşra", age:19, bio:"Moda tutkunu", img:"https://randomuser.me/api/portraits/women/24.jpg", premium:true},
+    {name:"Sibel", age:22, bio:"Film eleştirmeni", img:"https://randomuser.me/api/portraits/women/9.jpg", premium:true},
+    {name:"Nazlı", age:20, bio:"Sosyal sorumluluk projelerinde aktif", img:"https://randomuser.me/api/portraits/women/40.jpg", premium:true},
+    {name:"Dilan", age:23, bio:"Doğa aşığı ve fotoğrafçı", img:"https://randomuser.me/api/portraits/women/22.jpg", premium:true},
+    {name:"Aylin", age:21, bio:"Yazılım geliştirici", img:"https://randomuser.me/api/portraits/women/36.jpg", premium:true},
+
+    {name:"Selma", age:24, bio:"Mimarlık öğrencisi", img:"https://randomuser.me/api/portraits/women/33.jpg", premium:true},
+    {name:"İpek", age:20, bio:"Yoga ve meditasyon", img:"https://randomuser.me/api/portraits/women/8.jpg", premium:true},
+    {name:"Nisan", age:19, bio:"Kitap yazarı", img:"https://randomuser.me/api/portraits/women/18.jpg", premium:true},
+    {name:"Zeynep", age:22, bio:"Sporcu ve doğa tutkunu", img:"https://randomuser.me/api/portraits/women/26.jpg", premium:true},
+    {name:"Lara", age:23, bio:"Dans öğretmeni", img:"https://randomuser.me/api/portraits/women/3.jpg", premium:true}
+  ];
+
+  // --- ELEMENTLER ---
+  const profileList = document.getElementById('profile-list');
+  const registerForm = document.getElementById('register-form');
+  const loginForm = document.getElementById('login-form');
+  const registerErrorMsg = document.getElementById('register-error-msg');
+  const registerSuccessMsg = document.getElementById('register-success-msg');
+  const loginErrorMsg = document.getElementById('login-error-msg');
+  const premiumPopup = document.getElementById('premium-popup');
+  const closePopupBtn = document.getElementById('close-popup');
+  const toggleThemeBtn = document.getElementById('toggle-theme');
+  const logoutBtn = document.getElementById('logout-btn');
+  const formsContainer = document.getElementById('forms-container');
+
+  // --- Şifre göster/gizle fonksiyonları ---
+  function setupTogglePass(toggleId, inputId){
+    const toggle = document.getElementById(toggleId);
+    const input = document.getElementById(inputId);
+    toggle.addEventListener('click', () => {
+      if(input.type === 'password'){
+        input.type = 'text';
+        toggle.textContent = 'Gizle';
+      } else {
+        input.type = 'password';
+        toggle.textContent = 'Göster';
+      }
+    });
+  }
+  setupTogglePass('reg-toggle-pass','reg-password');
+  setupTogglePass('login-toggle-pass','login-password');
+
+  // --- Kayıt Doğrulama ---
+  function validateRegister(username,email,password){
+    if(username.length < 3) return 'Kullanıcı adı en az 3 karakter olmalı!';
+    if(!email.includes('@')) return 'Geçerli bir e-posta girin!';
+    if(password.length < 5) return 'Şifre en az 5 karakter olmalı!';
+    return '';
+  }
+
+  // --- Kayıt İşlemi ---
+  registerForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const username = document.getElementById('reg-username').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const err = validateRegister(username,email,password);
+    if(err){
+      registerErrorMsg.textContent = err;
+      registerSuccessMsg.textContent = '';
+      return;
+    }
+    // Basit kullanıcı kayıt kontrolü localStorage (email unique)
+    const users = JSON.parse(localStorage.getItem('flortflexUsers') || '[]');
+    if(users.some(u => u.email.toLowerCase() === email.toLowerCase())){
+      registerErrorMsg.textContent = 'Bu e-posta zaten kayıtlı!';
+      registerSuccessMsg.textContent = '';
+      return;
+    }
+    users.push({username,email,password});
+    localStorage.setItem('flortflexUsers', JSON.stringify(users));
+    registerErrorMsg.textContent = '';
+    registerSuccessMsg.textContent = 'Kayıt başarılı! Şimdi giriş yapabilirsin.';
+    registerForm.reset();
+  });
+
+  // --- Giriş İşlemi ---
+  loginForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const users = JSON.parse(localStorage.getItem('flortflexUsers') || '[]');
+    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+    if(!user){
+      loginErrorMsg.textContent = 'E-posta veya şifre yanlış!';
+      return;
+    }
+    loginErrorMsg.textContent = '';
+    localStorage.setItem('flortflexUser', JSON.stringify(user));
+    loginForm.reset();
+    registerForm.style.display = 'none';
+    loginForm.style.display = 'none';
+    formsContainer.style.display = 'none';
+    logoutBtn.style.display = 'inline-block';
+    alert(`Hoşgeldin, ${user.username}! Profillere göz atabilirsin.`);
+    renderProfiles();
+  });
+
+  // --- Çıkış Yap ---
+  logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('flortflexUser');
+    logoutBtn.style.display = 'none';
+    formsContainer.style.display = 'flex';
+    profileList.innerHTML = '';
+  });
+
+  // --- Profilleri Renderla ---
+  function renderProfiles(){
+    profileList.innerHTML = '';
+    const userData = localStorage.getItem('flortflexUser');
+    if(!userData){
+      profileList.innerHTML = `<p style="text-align:center; font-style:italic; color:#fff8; max-width:400px; margin:auto;">Görmek için lütfen kayıt ol veya giriş yap!</p>`;
+      return;
+    }
+    profiles.forEach((p,i) => {
+      const card = document.createElement('div');
+      card.classList.add('profile-card');
+      if(p.premium) card.classList.add('locked');
+      card.innerHTML = `
+        <img src="${p.img}" alt="${p.name}" />
+        <h3>${p.name}, ${p.age}</h3>
+        <p>${p.bio}</p>
+      `;
+      card.addEventListener('click', () => {
+        if(p.premium){
+          premiumPopup.style.display = 'block';
+          return;
+        }
+        // Profil detay sayfasına yönlendir
+        window.location.href = `profile.html?index=${i}`;
+      });
+      profileList.appendChild(card);
+    });
+  }
+
+  closePopupBtn.addEventListener('click', () => {
+    premiumPopup.style.display = 'none';
+  });
+
+  // --- Tema değişimi ---
+  toggleThemeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    if(document.body.classList.contains('dark')){
+      toggleThemeBtn.textContent = 'Gündüz Modu';
+    } else {
+      toggleThemeBtn.textContent = 'Gece Modu';
+    }
+  });
+
+  // Sayfa yüklendiğinde kullanıcı kontrolü ve profil listele
+  window.addEventListener('load', () => {
+    const userData = localStorage.getItem('flortflexUser');
+    if(userData){
+      formsContainer.style.display = 'none';
+      logoutBtn.style.display = 'inline-block';
+      renderProfiles();
+    }
+  });
+</script>
+
+</body>
+</html>
